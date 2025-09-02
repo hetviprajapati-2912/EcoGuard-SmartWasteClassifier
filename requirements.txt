@@ -1,0 +1,12 @@
+Django==5.2.4
+tensorflow>=2.16.0
+numpy
+matplotlib
+Pillow
+requests
+beautifulsoup4
+scikit-learn
+pandas
+seaborn
+folium 
+plotly

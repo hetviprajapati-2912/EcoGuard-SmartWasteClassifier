@@ -1,0 +1,1241 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>EcoGuard - Carbon Estimator</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --primary: #2ecc71;
+      --secondary: #3498db;
+      --accent: #f1c40f;
+      --danger: #e74c3c;
+      --dark-bg: #0f0f23;
+      --dark-card: #1a1a2e;
+      --light-bg: #f8fafc;
+      --light-card: #ffffff;
+      --text-light: #64748b;
+      --text-dark: #1e293b;
+      --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+      --gradient-4: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+      --gradient-5: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--light-bg);
+      color: #1e293b;
+      transition: all 0.3s ease;
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+    }
+
+    body.dark-mode {
+      background: var(--dark-bg);
+      color: #e2e8f0;
+    }
+
+    /* Navigation Styles */
+    .navbar {
+      background: linear-gradient(135deg, #2c3e50, #34495e);
+      box-shadow: 0 8px 32px rgba(44, 62, 80, 0.3);
+      margin: 0;
+      padding: 0;
+      backdrop-filter: blur(10px);
+      animation: slideDown 0.8s ease-out;
+    }
+    @keyframes slideDown {
+      from { transform: translateY(-100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .nav-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 40px;
+    }
+    .nav-logo h2 {
+      color: #2ecc71;
+      margin: 20px 0;
+      font-size: 32px;
+      font-weight: 800;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+      animation: glow 2s ease-in-out infinite alternate;
+    }
+    @keyframes glow {
+      from { text-shadow: 2px 2px 4px rgba(0,0,0,0.3), 0 0 15px rgba(46, 204, 113, 0.4); }
+      to { text-shadow: 2px 2px 4px rgba(0,0,0,0.3), 0 0 25px rgba(46, 204, 113, 0.6); }
+    }
+    .nav-links {
+      display: flex;
+      gap: 8px;
+    }
+    .nav-links a {
+      color: #bdc3c7;
+      text-decoration: none;
+      padding: 14px 28px;
+      font-weight: 600;
+      font-size: 16px;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 30px;
+      position: relative;
+      overflow: hidden;
+    }
+    .nav-links a::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      transition: left 0.5s;
+    }
+    .nav-links a:hover::before {
+      left: 100%;
+    }
+    .nav-links a:hover {
+      background: rgba(46, 204, 113, 0.2);
+      color: white;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(46, 204, 113, 0.3);
+    }
+    .nav-links a.active {
+      background: linear-gradient(135deg, #f1c40f, #f39c12);
+      color: #2c3e50;
+      box-shadow: 0 6px 20px rgba(241, 196, 15, 0.4);
+    }
+
+    /* Hero Section */
+    .hero {
+      background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+      padding: 100px 0;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+      animation: float 20s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-20px) rotate(1deg); }
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    .hero-title {
+      font-size: 4.2rem;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 25px;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+
+    .hero-subtitle {
+      font-size: 1.5rem;
+      color: rgba(255,255,255,0.9);
+      margin-bottom: 30px;
+    }
+
+    .hero-stats {
+      display: flex;
+      justify-content: center;
+      gap: 60px;
+      margin-top: 40px;
+    }
+
+    .hero-stat {
+      text-align: center;
+      color: white;
+    }
+
+    .hero-stat-number {
+      font-size: 2.2rem;
+      font-weight: 700;
+      display: block;
+    }
+
+    .hero-stat-label {
+      font-size: 1rem;
+      opacity: 0.8;
+    }
+
+    /* Dark Mode Toggle */
+    .dark-toggle {
+      position: fixed;
+      top: 120px;
+      right: 30px;
+      z-index: 1000;
+      background: var(--gradient-4);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      font-size: 24px;
+      cursor: pointer;
+      box-shadow: 0 8px 25px rgba(67, 233, 123, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .dark-toggle:hover {
+      transform: scale(1.1) rotate(180deg);
+    }
+
+    /* Main Container */
+    .container {
+      max-width: 1200px;
+      margin: -60px auto 0;
+      padding: 0 20px;
+      position: relative;
+      z-index: 10;
+    }
+
+    /* Input Form */
+    .input-card {
+      background: white;
+      border-radius: 32px;
+      padding: 50px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+      margin-bottom: 60px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    body.dark-mode .input-card {
+      background: var(--dark-card);
+      border: 1px solid #2d3748;
+    }
+
+    .input-card::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(67, 250, 123, 0.05) 0%, transparent 70%);
+      animation: rotate 30s linear infinite;
+    }
+
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .form-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--primary);
+      text-align: center;
+      margin-bottom: 30px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 30px;
+      margin-bottom: 40px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .form-label {
+      font-weight: 600;
+      color: var(--primary);
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .form-input, input[type="number"], select {
+      padding: 18px 24px;
+      border: 2px solid #e2e8f0;
+      border-radius: 16px;
+      background: #f8fafc;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      width: 100%;
+    }
+
+    .form-input:focus, input[type="number"]:focus, select:focus {
+      outline: none;
+      border-color: var(--primary);
+      background: white;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(46, 204, 113, 0.15);
+    }
+
+    body.dark-mode .form-input,
+    body.dark-mode input[type="number"],
+    body.dark-mode select {
+      background: var(--dark-bg);
+      border-color: #4a5568;
+      color: #e2e8f0;
+    }
+
+    .submit-btn {
+      background: var(--gradient-4);
+      color: white;
+      border: none;
+      padding: 16px 32px;
+      border-radius: 16px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      position: relative;
+      z-index: 2;
+      display: block;
+      margin: 0 auto;
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 40px rgba(67, 250, 123, 0.4);
+    }
+
+    /* Summary Cards */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      margin-bottom: 60px;
+    }
+
+    .summary-card {
+      background: white;
+      border-radius: 24px;
+      padding: 40px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    body.dark-mode .summary-card {
+      background: var(--dark-card);
+      border: 1px solid #2d3748;
+    }
+
+    .summary-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    }
+
+    .summary-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+    }
+
+    .summary-card:nth-child(1)::before { background: var(--gradient-4); }
+    .summary-card:nth-child(2)::before { background: var(--gradient-3); }
+    .summary-card:nth-child(3)::before { background: var(--gradient-2); }
+
+    .summary-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #64748b;
+      margin-bottom: 15px;
+    }
+
+    body.dark-mode .summary-title {
+      color: #94a3b8;
+    }
+
+    .summary-value {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 8px;
+    }
+
+    .summary-desc {
+      color: #64748b;
+      font-size: 0.9rem;
+    }
+
+    /* Charts Grid */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+      gap: 40px;
+      margin-bottom: 60px;
+    }
+
+    .chart-card {
+      background: white;
+      border-radius: 24px;
+      padding: 40px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    body.dark-mode .chart-card {
+      background: var(--dark-card);
+      border: 1px solid #2d3748;
+    }
+
+    .chart-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    }
+
+    .chart-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: var(--gradient-3);
+    }
+
+    .chart-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 25px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    body.dark-mode .chart-title {
+      color: #e2e8f0;
+    }
+
+    .chart-container {
+      height: 400px;
+      position: relative;
+    }
+
+    /* Tips Section */
+    .tips-section {
+      background: white;
+      border-radius: 24px;
+      padding: 40px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+      margin-bottom: 60px;
+    }
+
+    body.dark-mode .tips-section {
+      background: var(--dark-card);
+      border: 1px solid #2d3748;
+    }
+
+    .tips-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 25px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .tips-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .tip-item {
+      background: rgba(46, 204, 113, 0.05);
+      padding: 20px;
+      border-radius: 16px;
+      border-left: 4px solid var(--primary);
+      transition: all 0.3s ease;
+    }
+
+    .tip-item:hover {
+      background: rgba(46, 204, 113, 0.1);
+      transform: translateX(5px);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero-title { font-size: 2.5rem; }
+      .hero-stats { flex-direction: column; gap: 30px; }
+      .charts-grid { grid-template-columns: 1fr; }
+      .input-card { padding: 30px 20px; margin: -40px 20px 40px; }
+      .dark-toggle { top: 100px; right: 20px; width: 50px; height: 50px; }
+    }
+
+    /* Gamification Elements */
+    .achievement-popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+      z-index: 2000;
+      transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+    
+    .achievement-popup.show {
+      transform: translate(-50%, -50%) scale(1);
+    }
+    
+    .achievement-icon {
+      font-size: 4rem;
+      margin-bottom: 20px;
+      animation: bounce 1s infinite;
+    }
+    
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-10px); }
+      60% { transform: translateY(-5px); }
+    }
+    
+    .streak-counter {
+      position: fixed;
+      top: 120px;
+      left: 30px;
+      background: linear-gradient(135deg, #f093fb, #f5576c);
+      color: white;
+      padding: 15px 25px;
+      border-radius: 25px;
+      font-weight: 700;
+      box-shadow: 0 8px 25px rgba(240, 147, 251, 0.3);
+      animation: slideInLeft 0.8s ease-out;
+    }
+    
+    @keyframes slideInLeft {
+      from { transform: translateX(-100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    
+    .progress-ring {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 20px;
+    }
+    
+    .progress-ring svg {
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+    
+    .progress-ring circle {
+      fill: none;
+      stroke-width: 8;
+    }
+    
+    .progress-ring .bg {
+      stroke: #e2e8f0;
+    }
+    
+    .progress-ring .progress {
+      stroke: var(--primary);
+      stroke-linecap: round;
+      stroke-dasharray: 314;
+      stroke-dashoffset: 314;
+      animation: progressAnimation 2s ease-out forwards;
+    }
+    
+    @keyframes progressAnimation {
+      to { stroke-dashoffset: calc(314 - (314 * var(--progress)) / 100); }
+    }
+    
+    .progress-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    /* Footer Styles */
+    .footer {
+      background: linear-gradient(135deg, #2c3e50, #34495e);
+      color: white;
+      margin-top: 60px;
+      position: relative;
+      overflow: hidden;
+      animation: slideUp 0.8s ease-out;
+    }
+    .footer::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #2ecc71, #f1c40f, #3498db, #2ecc71);
+      background-size: 200% 100%;
+      animation: shimmer 3s ease-in-out infinite;
+    }
+    @keyframes shimmer {
+      0%, 100% { background-position: 200% 0; }
+      50% { background-position: -200% 0; }
+    }
+    @keyframes slideUp {
+      from { transform: translateY(100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .footer-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 60px 40px 40px;
+    }
+    .footer-content {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 60px;
+      margin-bottom: 50px;
+    }
+    .footer-section h3 {
+      color: #2ecc71;
+      margin-bottom: 25px;
+      font-size: 28px;
+      font-weight: 800;
+    }
+    .footer-section h4 {
+      color: #f1c40f;
+      margin-bottom: 25px;
+      font-size: 20px;
+      font-weight: 700;
+    }
+    .footer-section p {
+      color: #bdc3c7;
+      line-height: 1.7;
+      font-size: 17px;
+      margin-bottom: 20px;
+    }
+    .stats-item {
+      background: linear-gradient(135deg, rgba(46, 204, 113, 0.1), rgba(52, 152, 219, 0.1));
+      padding: 20px;
+      border-radius: 15px;
+      text-align: center;
+      margin-bottom: 15px;
+      transition: all 0.4s ease;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .stats-item:hover {
+      transform: translateY(-5px) scale(1.02);
+      box-shadow: 0 10px 30px rgba(46, 204, 113, 0.2);
+    }
+    .stats-number {
+      font-size: 28px;
+      font-weight: 800;
+      color: #f1c40f;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    }
+    .contact-info {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+      color: #bdc3c7;
+      font-size: 16px;
+      transition: color 0.3s ease;
+    }
+    .contact-info:hover {
+      color: #2ecc71;
+    }
+    .contact-info span {
+      margin-right: 15px;
+      font-size: 22px;
+    }
+    .footer-bottom {
+      border-top: 2px solid rgba(46, 204, 113, 0.3);
+      padding-top: 30px;
+      text-align: center;
+      color: #95a5a6;
+      font-size: 17px;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="nav-logo">
+        <h2>🌱 EcoGuard</h2>
+      </div>
+      <div class="nav-links">
+        <a href="{% url 'home' %}">Home</a>
+        <a href="{% url 'upload_image' %}">Waste Classifier</a>
+        <a href="/carbon-estimator/dashboard/" class="active">Carbon Estimator</a>
+        <a href="/dashboard/">Analytics Dashboard</a>
+        <a href="/eco-dashboard/">Eco Dashboard</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Dark Mode Toggle -->
+  <button class="dark-toggle" onclick="toggleDarkMode()">
+    <i class="fas fa-moon" id="darkIcon"></i>
+  </button>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1 class="hero-title">🌍 Carbon Footprint Tracker</h1>
+      <p class="hero-subtitle">AI-powered insights to reduce your environmental impact</p>
+
+    </div>
+  </section>
+
+  <div class="container">
+    <!-- Input Form -->
+    <div class="input-card">
+      <h2 class="form-title">📊 Track Your Daily Impact</h2>
+      <form method="POST" class="carbon-entry-form" id="carbonForm">
+        {% csrf_token %}
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label" for="id_transport_km">
+              <i class="fas fa-car"></i> Transport (km)
+            </label>
+            {{ form.transport_km }}
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="id_electricity_kwh">
+              <i class="fas fa-bolt"></i> Electricity (kWh)
+            </label>
+            {{ form.electricity_kwh }}
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="id_food_type">
+              <i class="fas fa-utensils"></i> Food Type
+            </label>
+            {{ form.food_type }}
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="id_plastic_grams">
+              <i class="fas fa-recycle"></i> Plastic Usage (g)
+            </label>
+            {{ form.plastic_grams }}
+          </div>
+        </div>
+        <button type="button" class="submit-btn" onclick="calculateCarbon()">
+          <i class="fas fa-calculator"></i> Calculate Impact
+        </button>
+      </form>
+
+      {% if message %}
+        <div style="text-align: center; margin-top: 20px; padding: 15px; background: rgba(46, 204, 113, 0.1); border-radius: 12px; color: var(--primary); font-weight: 600;">
+          {{ message }}
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="summary-grid">
+      <div class="summary-card">
+        <div class="summary-title">Today's Rating</div>
+        <div class="summary-value">{{ todays_rating|default:"Good" }}</div>
+        <div class="summary-desc">Based on your daily emissions</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-title">Total Emissions</div>
+        <div class="summary-value">{{ total_emission|default:"0" }} <small>kg</small></div>
+        <div class="summary-desc">CO₂ equivalent today</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-title">Global Comparison</div>
+        <div class="summary-value">{{ global_comparison|default:"Better" }}</div>
+        <div class="summary-desc">Than global average</div>
+      </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="charts-grid">
+      <div class="chart-card">
+        <h3 class="chart-title">
+          <i class="fas fa-chart-bar"></i> Category Breakdown
+        </h3>
+        <div class="chart-container">
+          <canvas id="barChart"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <h3 class="chart-title">
+          <i class="fas fa-chart-line"></i> 7-Day Trend
+        </h3>
+        <div class="chart-container">
+          <canvas id="lineChart"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <h3 class="chart-title">
+          <i class="fas fa-chart-area"></i> Performance Radar
+        </h3>
+        <div class="chart-container">
+          <canvas id="radarChart"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <h3 class="chart-title">
+          <i class="fas fa-target"></i> Weekly Goal Progress
+        </h3>
+        <div class="chart-container" style="display: flex; align-items: center; justify-content: center; flex-direction: column;">
+          <div style="width: 200px; height: 200px; position: relative;">
+            <canvas id="goalChart"></canvas>
+          </div>
+          <div style="margin-top: 20px; text-align: center;">
+            <div style="font-size: 2rem; font-weight: 800; color: var(--primary);">{{ weekly_goal_progress|default:"75" }}%</div>
+            <div style="color: #64748b;">Goal Achievement</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tips Section -->
+    <div class="tips-section">
+      <h3 class="tips-title">
+        <i class="fas fa-lightbulb"></i> AI-Powered Recommendations
+      </h3>
+      <div class="tips-grid">
+        {% for tip in tips %}
+        <div class="tip-item">
+          <i class="fas fa-leaf" style="color: var(--primary); margin-right: 8px;"></i>
+          {{ tip }}
+        </div>
+        {% empty %}
+        <div class="tip-item">
+          <i class="fas fa-car" style="color: var(--primary); margin-right: 8px;"></i>
+          Use public transport to reduce your carbon footprint by up to 45%
+        </div>
+        <div class="tip-item">
+          <i class="fas fa-lightbulb" style="color: var(--primary); margin-right: 8px;"></i>
+          Switch to LED bulbs to save 80% energy on lighting
+        </div>
+        <div class="tip-item">
+          <i class="fas fa-utensils" style="color: var(--primary); margin-right: 8px;"></i>
+          Choose plant-based meals twice a week to reduce food emissions
+        </div>
+        <div class="tip-item">
+          <i class="fas fa-recycle" style="color: var(--primary); margin-right: 8px;"></i>
+          Reduce plastic usage by 30% with reusable alternatives
+        </div>
+        <div class="tip-item">
+          <i class="fas fa-home" style="color: var(--primary); margin-right: 8px;"></i>
+          Set thermostat 2°C lower to save 10% on heating costs
+        </div>
+        <div class="tip-item">
+          <i class="fas fa-solar-panel" style="color: var(--primary); margin-right: 8px;"></i>
+          Consider solar panels for 70% renewable energy coverage
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Gamification Section -->
+    <div class="tips-section">
+      <h3 class="tips-title">
+        <i class="fas fa-trophy"></i> Your Eco Journey
+      </h3>
+      <div class="tips-grid">
+        <div class="tip-item" style="background: linear-gradient(135deg, rgba(241, 196, 15, 0.1), rgba(243, 156, 18, 0.1)); border-left-color: #f1c40f;">
+          <i class="fas fa-medal" style="color: #f1c40f; margin-right: 8px;"></i>
+          <strong>Eco Warrior Badge:</strong> 7-day streak achieved! 🏆
+        </div>
+        <div class="tip-item" style="background: linear-gradient(135deg, rgba(52, 152, 219, 0.1), rgba(41, 128, 185, 0.1)); border-left-color: #3498db;">
+          <i class="fas fa-fire" style="color: #3498db; margin-right: 8px;"></i>
+          <strong>Current Streak:</strong> 12 days of carbon tracking 🔥
+        </div>
+        <div class="tip-item" style="background: linear-gradient(135deg, rgba(155, 89, 182, 0.1), rgba(142, 68, 173, 0.1)); border-left-color: #9b59b6;">
+          <i class="fas fa-star" style="color: #9b59b6; margin-right: 8px;"></i>
+          <strong>Level:</strong> Carbon Conscious (Level 3) ⭐
+        </div>
+        <div class="tip-item" style="background: linear-gradient(135deg, rgba(231, 76, 60, 0.1), rgba(192, 57, 43, 0.1)); border-left-color: #e74c3c;">
+          <i class="fas fa-target" style="color: #e74c3c; margin-right: 8px;"></i>
+          <strong>Next Goal:</strong> Reduce weekly emissions by 15% 🎯
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Streak Counter -->
+  <div class="streak-counter">
+    <i class="fas fa-fire"></i> 12 Day Streak!
+  </div>
+
+  <!-- Achievement Popup -->
+  <div class="achievement-popup" id="achievementPopup">
+    <div class="achievement-icon">🏆</div>
+    <h3>Achievement Unlocked!</h3>
+    <p id="achievementText">Eco Warrior Badge Earned!</p>
+    <button onclick="closeAchievement()" style="margin-top: 20px; padding: 10px 20px; background: var(--primary); color: white; border: none; border-radius: 8px; cursor: pointer;">Awesome!</button>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-content">
+        <div class="footer-section">
+          <h3>🌱 EcoGuard</h3>
+          <p>Making waste management smarter and more sustainable through AI-powered classification and analytics.</p>
+          <div class="contact-info">
+            <span>📧</span> info@ecoguard.com
+          </div>
+          <div class="contact-info">
+            <span>📱</span> +1 (555) 123-4567
+          </div>
+        </div>
+        <div class="footer-section">
+          <h4>📊 Impact Stats</h4>
+          <div class="stats-item">
+            <div class="stats-number">50,000+</div>
+            <div>Carbon Calculations</div>
+          </div>
+          <div class="stats-item">
+            <div class="stats-number">98%</div>
+            <div>Accuracy Rate</div>
+          </div>
+        </div>
+        <div class="footer-section">
+          <h4>🌍 Sustainability</h4>
+          <div class="stats-item">
+            <div class="stats-number">15.2 tons</div>
+            <div>CO₂ Saved</div>
+          </div>
+          <div class="stats-item">
+            <div class="stats-number">2,500+</div>
+            <div>Trees Equivalent</div>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2024 EcoGuard. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Dark mode
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode');
+      const icon = document.getElementById('darkIcon');
+      icon.className = document.body.classList.contains('dark-mode') ? 'fas fa-sun' : 'fas fa-moon';
+      localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+      updateCharts();
+    }
+
+    if (localStorage.getItem('darkMode') === 'true') {
+      document.body.classList.add('dark-mode');
+      document.getElementById('darkIcon').className = 'fas fa-sun';
+    }
+
+    // Achievement System
+    function showAchievement(text) {
+      const popup = document.getElementById('achievementPopup');
+      const textEl = document.getElementById('achievementText');
+      textEl.textContent = text;
+      popup.classList.add('show');
+    }
+
+    function closeAchievement() {
+      document.getElementById('achievementPopup').classList.remove('show');
+    }
+
+    // Calculate carbon footprint via AJAX
+    function calculateCarbon() {
+      const form = document.getElementById('carbonForm');
+      const formData = new FormData(form);
+      const submitBtn = document.querySelector('.submit-btn');
+      
+      // Show loading state
+      const originalText = submitBtn.innerHTML;
+      submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Calculating...';
+      submitBtn.disabled = true;
+      
+      // Send AJAX request
+      fetch(window.location.href, {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.text())
+      .then(html => {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        
+        // Update message if exists
+        const newMessage = doc.querySelector('[style*="background: rgba(46, 204, 113, 0.1)"]');
+        const currentMessage = document.querySelector('[style*="background: rgba(46, 204, 113, 0.1)"]');
+        if (newMessage) {
+          if (currentMessage) {
+            currentMessage.replaceWith(newMessage);
+          } else {
+            form.parentNode.appendChild(newMessage);
+          }
+        }
+        
+        // Update summary cards
+        const newSummaryCards = doc.querySelectorAll('.summary-card');
+        const currentSummaryCards = document.querySelectorAll('.summary-card');
+        newSummaryCards.forEach((newCard, index) => {
+          if (currentSummaryCards[index]) {
+            // Animate the value change
+            const newValue = newCard.querySelector('.summary-value').textContent;
+            const currentValueEl = currentSummaryCards[index].querySelector('.summary-value');
+            currentValueEl.style.transform = 'scale(1.2)';
+            currentValueEl.style.color = 'var(--primary)';
+            setTimeout(() => {
+              currentValueEl.textContent = newValue;
+              currentValueEl.style.transform = 'scale(1)';
+            }, 200);
+          }
+        });
+        
+        // Update charts with new data
+        updateChartsWithNewData(doc);
+        
+        // Show achievement
+        setTimeout(() => {
+          showAchievement('Daily Carbon Tracker Badge Earned! 🌱');
+        }, 1000);
+        
+        // Reset button
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+        alert('Sorry, there was an error calculating your carbon footprint. Please try again.');
+      });
+    }
+    
+    // Update charts with new data
+    function updateChartsWithNewData(doc) {
+      // Extract new data from the response (if available)
+      // For now, we'll just refresh the existing charts with some animation
+      if (window.barChart) {
+        window.barChart.data.datasets[0].data = window.barChart.data.datasets[0].data.map(() => 
+          Math.random() * 5 + 1
+        );
+        window.barChart.update('active');
+      }
+    }
+
+    // Charts
+    function updateCharts() {
+      const isDark = document.body.classList.contains('dark-mode');
+      const textColor = isDark ? '#e2e8f0' : '#1e293b';
+      
+      if (window.barChart) {
+        window.barChart.options.scales.x.ticks.color = textColor;
+        window.barChart.options.scales.y.ticks.color = textColor;
+        window.barChart.update();
+      }
+    }
+
+    // Initialize charts
+    // Handle Enter key press on form inputs
+    document.addEventListener('DOMContentLoaded', function() {
+      const formInputs = document.querySelectorAll('#carbonForm input, #carbonForm select');
+      formInputs.forEach(input => {
+        input.addEventListener('keypress', function(e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            calculateCarbon();
+          }
+        });
+      });
+      const isDark = document.body.classList.contains('dark-mode');
+      const textColor = isDark ? '#e2e8f0' : '#1e293b';
+
+      // Bar Chart
+      const barCtx = document.getElementById('barChart').getContext('2d');
+      window.barChart = new Chart(barCtx, {
+        type: 'bar',
+        data: {
+          labels: {{ categories|safe|default:"['Transport', 'Electricity', 'Food', 'Plastic']" }},
+          datasets: [{
+            label: 'Emissions (kg CO₂e)',
+            data: {{ emissions_values|safe|default:"[2.5, 1.8, 3.2, 0.5]" }},
+            backgroundColor: ['#2ecc71', '#3498db', '#f1c40f', '#e74c3c'],
+            borderRadius: 8,
+            borderSkipped: false,
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: { 
+              beginAtZero: true,
+              ticks: { color: textColor }
+            },
+            x: {
+              ticks: { color: textColor }
+            }
+          }
+        }
+      });
+
+      // Line Chart
+      const lineCtx = document.getElementById('lineChart').getContext('2d');
+      new Chart(lineCtx, {
+        type: 'line',
+        data: {
+          labels: {{ trend_dates|safe|default:"['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']" }},
+          datasets: [{
+            label: 'Daily Emissions',
+            data: {{ trend_values|safe|default:"[8.2, 6.5, 7.1, 5.8, 9.2, 4.3, 6.7]" }},
+            fill: true,
+            backgroundColor: 'rgba(52, 152, 219, 0.2)',
+            borderColor: '#3498db',
+            tension: 0.4,
+            pointBackgroundColor: '#3498db',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2,
+            pointRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: { 
+              beginAtZero: true,
+              ticks: { color: textColor }
+            },
+            x: {
+              ticks: { color: textColor }
+            }
+          }
+        }
+      });
+
+      // Radar Chart
+      const radarCtx = document.getElementById('radarChart').getContext('2d');
+      new Chart(radarCtx, {
+        type: 'radar',
+        data: {
+          labels: {{ radar_categories|safe|default:"['Transport', 'Electricity', 'Food', 'Plastic', 'Water']" }},
+          datasets: [
+            {
+              label: 'Your Emissions',
+              data: {{ radar_user_values|safe|default:"[7, 5, 8, 3, 6]" }},
+              fill: true,
+              backgroundColor: 'rgba(46, 204, 113, 0.2)',
+              borderColor: '#2ecc71',
+              pointBackgroundColor: '#2ecc71',
+              pointBorderColor: '#fff',
+              pointBorderWidth: 2
+            },
+            {
+              label: 'Family Average',
+              data: {{ radar_family_values|safe|default:"[6, 7, 6, 5, 7]" }},
+              fill: true,
+              backgroundColor: 'rgba(231, 76, 60, 0.2)',
+              borderColor: '#e74c3c',
+              pointBackgroundColor: '#e74c3c',
+              pointBorderColor: '#fff',
+              pointBorderWidth: 2
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              labels: { color: textColor }
+            }
+          },
+          scales: {
+            r: {
+              angleLines: { color: isDark ? '#4a5568' : '#e2e8f0' },
+              grid: { color: isDark ? '#4a5568' : '#e2e8f0' },
+              pointLabels: { color: textColor },
+              ticks: { 
+                color: textColor,
+                backdropColor: 'transparent'
+              }
+            }
+          }
+        }
+      });
+
+      // Goal Progress Chart
+      const goalCtx = document.getElementById('goalChart').getContext('2d');
+      new Chart(goalCtx, {
+        type: 'doughnut',
+        data: {
+          datasets: [{
+            data: [{{ weekly_goal_progress|default:"75" }}, 25],
+            backgroundColor: ['#2ecc71', '#e2e8f0'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '80%',
+          plugins: {
+            legend: { display: false }
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>

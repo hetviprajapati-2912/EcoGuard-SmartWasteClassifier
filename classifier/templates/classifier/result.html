@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Classification Result</title>
+</head>
+<body>
+    <h2>Prediction: {{ predicted_class }}</h2>
+
+    <h3>Uploaded Image:</h3>
+    <img src="{{ MEDIA_URL }}{{ uploaded_image }}" width="300">
+
+    <h3>Confidence Chart:</h3>
+    <img src="{{ MEDIA_URL }}{{ chart_image }}" width="400">
+
+    <br><br>
+    <a href="/">Classify another image</a>
+</body>
+</html>
